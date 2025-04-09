@@ -23,6 +23,7 @@ archive.zip
 database
 database.db
 /database/
+database.sqlite3
 
 # vim temporary files
 *~
