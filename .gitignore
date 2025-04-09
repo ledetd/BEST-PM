@@ -24,6 +24,7 @@ database
 database.db
 /database/
 database.sqlite3
+__pycache__/
 
 # vim temporary files
 *~
