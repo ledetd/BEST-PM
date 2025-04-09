@@ -24,6 +24,11 @@ def get_session():
     with Session(engine) as session:
         yield session
 
+#Home Page
+@app.get("/")
+def root():
+    return {"Data": "BEST-PM"}
+
 # Create a Crew Member
 @app.post("/crews", response_model=Crew)
 def create_crew(crew: Crew, session: Session = Depends(get_session)):
