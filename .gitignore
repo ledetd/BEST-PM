@@ -21,6 +21,8 @@ venv
 docs.zip
 archive.zip
 database
+database.db
+/database/
 
 # vim temporary files
 *~
