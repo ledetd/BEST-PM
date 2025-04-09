@@ -3,14 +3,8 @@ from typing import Optional
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from models import Crew, Project
 
-
-class Crew(SQLModel, table=True):
-    id: Optional[int] = Field(primary_key=True)
-    name: str
-    position: str
-    location: str
-   
 
 # Create the FastAPI app
 app = FastAPI()
@@ -29,6 +23,7 @@ def get_session():
 def root():
     return {"Data": "BEST-PM"}
 
+# Crew CRUD
 # Create a Crew Member
 @app.post("/crews", response_model=Crew)
 def create_crew(crew: Crew, session: Session = Depends(get_session)):
@@ -52,7 +47,6 @@ def read_crew(crew_id: int, session: Session = Depends(get_session)):
     if not crew:
         raise HTTPException(status_code=404, detail="Crew member not found")
     return crew
-
 
 # Update a Crew
 @app.put("/crews/{crew_id}", response_model=Crew)
@@ -78,6 +72,57 @@ def delete_crew(crew_id: int, session: Session = Depends(get_session)):
     session.delete(crew)
     session.commit()
     return crew
+
+# Project CRUD
+# Create a Project
+@app.post("/projects", response_model=Project)
+def create_project(project: Project, session: Session = Depends(get_session)):
+    session.add(project)
+    session.commit()
+    session.refresh(project)
+    return project
+
+# Read all projects
+@app.get("/projects", response_model=list[Project])
+def read_projects(
+    skip: int = 0, limit: int = 10, session: Session = Depends(get_session)
+):
+    projects = session.exec(select(Project).offset(skip).limit(limit)).all()
+    return projects
+
+# Read a project by ID
+@app.get("/projects/{project_id}", response_model=Project)
+def read_project(project_id: int, session: Session = Depends(get_session)):
+    project = session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
+# Update a Project
+@app.put("/projects/{project_id}", response_model=Project)
+def update_project(project_id: int, project_data: Project, session: Session = Depends(get_session)):
+    project = session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Update the project's attributes
+    for field, value in project_data.model_dump().items():
+        setattr(project, field, value)
+    session.commit()
+    session.refresh(project)
+    return project
+
+# Delete a Project
+@app.delete("/projects/{project_id}", response_model=Project)
+def delete_project(project_id: int, session: Session = Depends(get_session)):
+    project = session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    session.delete(project)
+    session.commit()
+    return project
+
 
 
 if __name__ == "__main__":
