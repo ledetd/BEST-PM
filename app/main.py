@@ -127,3 +127,5 @@ def delete_project(project_id: int, session: Session = Depends(get_session)):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
+# Run App With: uv run app/main.py
